@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HouseTab D6 — Friendly Bill Splitting for Rathmines Students</title>
+  <!-- Google Fonts: Plus Jakarta Sans for friendly, crisp, ESL-readable typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* =====================================================================
+       DESIGN TOKENS & RESET (Zero external CSS dependencies)
+       ===================================================================== */
+    :root {
+      --bg-page: #F6F5FF;
+      --bg-surface: #FFFFFF;
+      --bg-soft-indigo: #EEF0FF;
+      --bg-soft-coral: #FFF1EE;
+      --bg-soft-amber: #FFFBEB;
+      --bg-soft-mint: #ECFDF5;
+
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --violet-600: #7C3AED;
+      --coral-500: #F97316;
+      --coral-600: #EA580C;
+      --amber-500: #F59E0B;
+      --amber-800: #92400E;
+      --mint-600: #059669;
+      --mint-700: #047857;
+
+      --text-main: #1E1B4B;
+      --text-body: #334155;
+      --text-muted: #64748B;
+      --border-light: #E2E8F0;
+      --border-indigo: #C7D2FE;
+
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-pill: 9999px;
+      --shadow-card: 0 10px 28px -6px rgba(30, 27, 75, 0.08), 0 2px 6px -1px rgba(30, 27, 75, 0.04);
+      --shadow-pop: 0 14px 34px -8px rgba(79, 70, 229, 0.25);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* High-visibility focus ring for keyboard & accessibility */
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    a:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid var(--coral-500);
+      outline-offset: 2px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 18px;
+    }
+
+    /* =====================================================================
+       1. TOP TRUST & ETHICS BANNER
+       ===================================================================== */
+    .trust-banner {
+      background: linear-gradient(90deg, #312E81 0%, #4F46E5 55%, #6D28D9 100%);
+      color: #FFFFFF;
+      padding: 12px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 2px 10px rgba(30, 27, 75, 0.15);
+    }
+
+    .trust-banner-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: #FBBF24;
+      color: #1E1B4B;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .ethics-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 0.875rem;
+      font-weight: 700;
+    }
+
+    /* =====================================================================
+       2. HERO SECTION ("THE PROMISE")
+       ===================================================================== */
+    .hero {
+      background: radial-gradient(circle at top right, #E0E7FF 0%, #FFFFFF 55%, #FFF7ED 100%);
+      border-bottom: 2px solid var(--border-indigo);
+      padding: 40px 0 48px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-soft-amber);
+      border: 2px solid #FDE68A;
+      color: var(--amber-800);
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 7px 15px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 16px;
+      font-size: clamp(1.95rem, 4.5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      color: var(--text-main);
+    }
+
+    .hero h1 span {
+      background: linear-gradient(90deg, var(--indigo-600), var(--violet-600));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      margin: 0 0 28px;
+      font-size: 1.15rem;
+      color: var(--text-body);
+      max-width: 680px;
+      font-weight: 500;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    /* Tap-friendly buttons (min 48px height) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 52px;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-decoration: none;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--indigo-600), var(--violet-600));
+      color: #FFFFFF;
+      box-shadow: var(--shadow-pop);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--indigo-700), #6D28D9);
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: var(--text-main);
+      border-color: var(--border-indigo);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-soft-indigo);
+    }
+
+    .btn-coral {
+      background: linear-gradient(135deg, var(--coral-500), var(--coral-600));
+      color: #FFFFFF;
+      box-shadow: 0 10px 24px -6px rgba(234, 88, 12, 0.35);
+    }
+
+    .btn-coral:hover {
+      background: linear-gradient(135deg, var(--coral-600), #C2410C);
+    }
+
+    .btn-mint {
+      background: var(--mint-600);
+      color: #FFFFFF;
+    }
+
+    .btn-mint:hover {
+      background: var(--mint-700);
+    }
+
+    /* =====================================================================
+       3. LIVE PROTOTYPE SECTION ("THE PROOF")
+       ===================================================================== */
+    .section {
+      padding: 40px 0;
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--indigo-600);
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.5rem, 3.2vw, 2.05rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .reset-btn {
+      min-height: 48px;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      background: #FFFFFF;
+      border: 2px solid var(--border-light);
+      color: var(--text-body);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .reset-btn:hover {
+      border-color: var(--indigo-600);
+      color: var(--indigo-600);
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 24px;
+    }
+
+    /* Housemate Selector Pills */
+    .selector-label {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: var(--text-main);
+    }
+
+    .housemate-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 12px;
+    }
+
+    .mate-pill {
+      min-height: 56px;
+      padding: 10px 16px;
+      border-radius: var(--radius-pill);
+      border: 2px solid var(--border-indigo);
+      background: var(--bg-soft-indigo);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .mate-pill:hover {
+      transform: translateY(-2px);
+      border-color: var(--indigo-600);
+    }
+
+    .mate-pill[aria-pressed="true"] {
+      background: linear-gradient(135deg, var(--indigo-600), var(--violet-600));
+      color: #FFFFFF;
+      border-color: transparent;
+      box-shadow: var(--shadow-pop);
+    }
+
+    .mate-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #1E1B4B;
+      background: #FDE68A;
+      flex-shrink: 0;
+    }
+
+    /* Personal Summary Card ("First Screen: What I Owe") */
+    .summary-card {
+      background: linear-gradient(145deg, #1E1B4B 0%, #312E81 100%);
+      color: #FFFFFF;
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      box-shadow: var(--shadow-pop);
+      margin-bottom: 24px;
+    }
+
+    .summary-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+      margin-bottom: 20px;
+    }
+
+    .summary-title {
+      margin: 2px 0 0;
+      font-size: clamp(1.45rem, 3vw, 1.9rem);
+      font-weight: 800;
+    }
+
+    .house-badge {
+      background: rgba(255, 255, 255, 0.14);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #E0E7FF;
+    }
+
+    .summary-subhead {
+      margin: 0 0 12px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #A5B4FC;
+    }
+
+    .owe-total-banner {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0 0 14px;
+    }
+
+    .owe-total-amount {
+      color: #FBBF24;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .owe-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .owe-item {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .owe-item-text {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .owe-item-text .money {
+      color: #FDE047;
+    }
+
+    .owe-item-sub {
+      margin: 3px 0 0;
+      font-size: 0.95rem;
+      color: #E0E7FF;
+    }
+
+    .all-clear-box {
+      background: rgba(16, 185, 129, 0.18);
+      border: 2px solid rgba(52, 211, 153, 0.5);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+
+    .all-clear-box strong {
+      display: block;
+      font-size: 1.25rem;
+      color: #6EE7B7;
+      margin-bottom: 4px;
+    }
+
+    .owed-to-me-section {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .owed-to-me-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+    }
+
+    .owed-card {
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .owed-card strong {
+      color: #6EE7B7;
+    }
+
+    /* Form Controls */
+    .form-title {
+      margin: 0 0 6px;
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+
+    .form-desc {
+      margin: 0 0 20px;
+      color: var(--text-body);
+      font-size: 1rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 800;
+      font-size: 0.98rem;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .input, .select {
+      width: 100%;
+      min-height: 52px;
+      padding: 12px 15px;
+      border-radius: var(--radius-md);
+      border: 2px solid #CBD5E1;
+      background: #F8FAFC;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .input:focus, .select:focus {
+      background: #FFFFFF;
+      border-color: var(--indigo-600);
+    }
+
+    .split-mode-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .radio-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 54px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 2px solid #CBD5E1;
+      background: #F8FAFC;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .radio-card input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--indigo-600);
+    }
+
+    .custom-box {
+      background: var(--bg-soft-indigo);
+      border: 2px solid var(--border-indigo);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .custom-box.hidden,
+    .hidden {
+      display: none !important;
+    }
+
+    .custom-checks {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .check-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 10px 14px;
+      background: #FFFFFF;
+      border: 2px solid var(--border-indigo);
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .check-pill input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--indigo-600);
+    }
+
+    .alert-box {
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: #FEF2F2;
+      border: 2px solid #FCA5A5;
+      color: #991B1B;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    /* Shared Bill Ledger */
+    .ledger-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .count-pill {
+      background: var(--bg-soft-indigo);
+      color: var(--indigo-700);
+      border: 2px solid var(--border-indigo);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .bill-feed {
+      display: grid;
+      gap: 16px;
+    }
+
+    .bill-card {
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      background: #FFFFFF;
+    }
+
+    .bill-card.settled {
+      background: #F8FAFC;
+      border-color: #CBD5E1;
+    }
+
+    .bill-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 14px;
+    }
+
+    .bill-name {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bill-meta {
+      margin: 4px 0 0;
+      color: var(--text-body);
+      font-size: 0.98rem;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+
+    .status-badge.open {
+      background: var(--bg-soft-amber);
+      color: var(--amber-800);
+      border: 1px solid #FCD34D;
+    }
+
+    .status-badge.done {
+      background: var(--bg-soft-mint);
+      color: var(--mint-700);
+      border: 1px solid #6EE7B7;
+    }
+
+    .shares-label {
+      margin: 0 0 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .shares-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 10px;
+    }
+
+    .share-btn {
+      min-height: 56px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 2px solid;
+      font-family: inherit;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .share-btn:active {
+      transform: scale(0.97);
+    }
+
+    .share-btn.unpaid {
+      background: var(--bg-soft-coral);
+      border-color: #FDBA74;
+      color: #9A3412;
+    }
+
+    .share-btn.unpaid:hover {
+      background: #FFEDD5;
+    }
+
+    .share-btn.paid {
+      background: var(--bg-soft-mint);
+      border-color: #6EE7B7;
+      color: #065F46;
+    }
+
+    .share-payer-box {
+      min-height: 56px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--bg-soft-indigo);
+      border: 2px solid var(--border-indigo);
+      color: var(--indigo-700);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .share-person {
+      display: block;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .share-state {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* =====================================================================
+       4. CALL TO ACTION ("START YOUR HOUSE TAB")
+       ===================================================================== */
+    .cta-section {
+      background: linear-gradient(135deg, #EEF2FF 0%, #FFF7ED 100%);
+      border-top: 2px solid var(--border-indigo);
+      padding: 46px 0;
+    }
+
+    .cta-card {
+      background: #FFFFFF;
+      border: 2px solid var(--border-indigo);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .confirm-panel {
+      margin-top: 22px;
+      padding: 22px;
+      border-radius: var(--radius-md);
+      background: var(--bg-soft-mint);
+      border: 2px solid var(--mint-600);
+    }
+
+    .confirm-panel h3 {
+      margin: 0 0 6px;
+      color: #065F46;
+      font-size: 1.25rem;
+    }
+
+    .invite-box {
+      width: 100%;
+      margin: 12px 0;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 2px solid #A7F3D0;
+      background: #FFFFFF;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 600;
+      resize: none;
+    }
+
+    .cta-btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .copy-toast {
+      font-weight: 800;
+      color: var(--mint-700);
+      font-size: 0.95rem;
+    }
+
+    /* =====================================================================
+       5. "WHAT I STAND BEHIND" FOOTER
+       ===================================================================== */
+    .ethics-footer {
+      background: #1E1B4B;
+      color: #F8FAFC;
+      padding: 36px 0 42px;
+    }
+
+    .footer-label {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #FBBF24;
+      margin-bottom: 12px;
+    }
+
+    .stand-behind-box {
+      border-left: 4px solid #F97316;
+      padding-left: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .stand-behind-box p {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.55;
+      color: #E0E7FF;
+    }
+
+    @media (max-width: 600px) {
+      .card, .summary-card, .cta-card {
+        padding: 18px;
+      }
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =====================================================================
+       1. TOP TRUST & ETHICS BANNER
+       ===================================================================== -->
+  <header class="trust-banner">
+    <div class="trust-banner-inner">
+      <div class="brand-mark">
+        <span class="brand-icon" aria-hidden="true">D6</span>
+        <span>HouseTab D6</span>
+      </div>
+      <div class="ethics-pill" role="note">
+        <span aria-hidden="true">🏠</span>
+        <span>Student Prototype &bull; Rathmines, Dublin 6 &bull; No bank login needed</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- =====================================================================
+         2. LANDING PAGE HERO ("THE PROMISE")
+         ===================================================================== -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container">
+        <div class="hero-tag">
+          <span aria-hidden="true">🎓</span>
+          <span>Made for 5 international students sharing a house in Rathmines</span>
+        </div>
+        <h1 id="hero-heading">
+          Split house bills in Rathmines <span>without chasing friends on WhatsApp.</span>
+        </h1>
+        <p class="hero-sub">
+          When electricity, gas, or Wi-Fi comes in one person&rsquo;s name, everyone sees what they owe in one simple place&mdash;so nobody has to play the bad guy asking for money.
+        </p>
+        <div class="hero-actions">
+          <a href="#live-prototype" class="btn btn-primary">
+            <span aria-hidden="true">⚡</span> Try Live House Tab
+          </a>
+          <a href="#start-house-tab" class="btn btn-secondary">
+            <span aria-hidden="true">🔗</span> Start Your House Tab
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         3. LIVE INTERACTIVE WORKING PROTOTYPE ("THE PROOF")
+         ===================================================================== -->
+    <section id="live-prototype" class="section" aria-labelledby="prototype-heading">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="eyebrow">Working House Prototype &bull; Demo Data</span>
+            <h2 id="prototype-heading" class="section-title">First Screen: What You Owe &amp; To Whom</h2>
+          </div>
+          <button type="button" id="reset-demo-btn" class="reset-btn">
+            <span aria-hidden="true">↺</span> Reset Demo
+          </button>
+        </div>
+
+        <!-- Housemate Selector (No digging) -->
+        <div class="card">
+          <span id="selector-heading" class="selector-label">
+            1. Tap your name to see your bills:
+          </span>
+          <div id="housemate-selector" class="housemate-grid" role="group" aria-labelledby="selector-heading">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Instant Personal Summary Card -->
+        <div id="personal-summary" class="summary-card" aria-live="polite">
+          <!-- Populated dynamically with plain-English obligations -->
+        </div>
+
+        <!-- Add & Split a New Bill Form -->
+        <div class="card">
+          <h3 class="form-title">2. Add &amp; Split a New Bill</h3>
+          <p class="form-desc">
+            Paid a house bill? Add it below and everyone&rsquo;s balance updates right away.
+          </p>
+
+          <form id="new-bill-form" novalidate>
+            <div class="form-grid">
+              <div class="field">
+                <label for="bill-name">Bill Name</label>
+                <input
+                  type="text"
+                  id="bill-name"
+                  class="input"
+                  placeholder="e.g., Electricity, Gas, Bins"
+                  required
+                />
+              </div>
+
+              <div class="field">
+                <label for="bill-amount">Total Amount (€)</label>
+                <input
+                  type="number"
+                  id="bill-amount"
+                  class="input"
+                  step="0.01"
+                  min="0.01"
+                  placeholder="e.g., 120.00"
+                  required
+                />
+              </div>
+
+              <div class="field">
+                <label for="bill-payer">Who Paid It?</label>
+                <select id="bill-payer" class="select">
+                  <!-- Options injected by JS -->
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>How should we split it?</label>
+              <div class="split-mode-row">
+                <label class="radio-card">
+                  <input type="radio" name="splitType" value="equal5" checked />
+                  <span>Equal 5-way split (All 5)</span>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="splitType" value="custom" />
+                  <span>Pick who shares this bill</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Custom Split Checkboxes -->
+            <div id="custom-split-panel" class="custom-box hidden">
+              <strong>Select housemates sharing this bill:</strong>
+              <div id="custom-split-list" class="custom-checks">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <div id="bill-form-error" class="alert-box hidden" role="alert"></div>
+
+            <button type="submit" class="btn btn-coral" style="width: 100%;">
+              <span aria-hidden="true">➕</span> Split This Bill
+            </button>
+          </form>
+        </div>
+
+        <!-- Shared House Bill Ledger -->
+        <div class="card">
+          <div class="ledger-header">
+            <div>
+              <h3 class="form-title" style="margin-bottom: 2px;">3. Shared House Bill Ledger</h3>
+              <p class="form-desc" style="margin-bottom: 0;">
+                Tap any housemate&rsquo;s share to mark it Paid or Unpaid and watch totals update live.
+              </p>
+            </div>
+            <span id="bill-count-pill" class="count-pill">3 bills</span>
+          </div>
+
+          <div id="bill-ledger-list" class="bill-feed">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         4. REAL CALL TO ACTION ("START YOUR HOUSE TAB")
+         ===================================================================== -->
+    <section id="start-house-tab" class="cta-section" aria-labelledby="cta-heading">
+      <div class="container">
+        <div class="cta-card">
+          <span class="eyebrow">Ready for your own house?</span>
+          <h2 id="cta-heading" class="section-title" style="margin-bottom: 8px;">
+            Start Your House Tab
+          </h2>
+          <p class="form-desc">
+            Enter your Rathmines house nickname and email. Get a custom house link and a ready-to-paste WhatsApp message for your housemates right now.
+          </p>
+
+          <form id="house-signup-form" novalidate>
+            <div class="form-grid">
+              <div class="field">
+                <label for="house-nickname">House Nickname</label>
+                <input
+                  type="text"
+                  id="house-nickname"
+                  class="input"
+                  placeholder="e.g., Rathmines Road House"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="student-email">Your Email Address</label>
+                <input
+                  type="email"
+                  id="student-email"
+                  class="input"
+                  placeholder="e.g., sam.d6@studentmail.ie"
+                  required
+                />
+              </div>
+            </div>
+
+            <div id="cta-error-box" class="alert-box hidden" role="alert"></div>
+
+            <button type="submit" class="btn btn-primary">
+              <span aria-hidden="true">🚀</span> Create My House Link
+            </button>
+          </form>
+
+          <!-- Instant On-Screen Confirmation + Copy WhatsApp Message -->
+          <div id="cta-confirm-panel" class="confirm-panel hidden" aria-live="polite">
+            <h3 id="cta-confirm-heading">Your House Tab is ready!</h3>
+            <p id="cta-confirm-sub" style="margin: 0; color: #064E3B; font-weight: 600;"></p>
+
+            <label for="whatsapp-msg-box" style="display:block; margin-top:14px; font-weight:800; font-size:0.85rem; text-transform:uppercase; color:#065F46;">
+              WhatsApp message for your housemates:
+            </label>
+            <textarea id="whatsapp-msg-box" class="invite-box" rows="3" readonly></textarea>
+
+            <div class="cta-btn-row">
+              <button type="button" id="copy-wa-btn" class="btn btn-mint">
+                <span aria-hidden="true">📋</span> Copy WhatsApp Message for Housemates
+              </button>
+              <a id="mailto-invite-link" href="#" class="btn btn-secondary">
+                <span aria-hidden="true">✉️</span> Send via Email App
+              </a>
+              <span id="copy-toast" class="copy-toast hidden">✓ Copied! Paste it in WhatsApp.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =====================================================================
+       5. "WHAT I STAND BEHIND" FOOTER
+       ===================================================================== -->
+  <footer class="ethics-footer">
+    <div class="container">
+      <span class="footer-label">What I Stand Behind</span>
+      <div class="stand-behind-box">
+        <p>
+          I intentionally left out Sam&rsquo;s request to put &ldquo;Approved by NCI&rdquo; and &ldquo;Bank-grade security&rdquo; at the top because neither claim is true for this student prototype.
+        </p>
+        <p>
+          Never claim fake institutional endorsements or misleading security guarantees to earn trust&mdash;open, honest math between housemates builds real trust.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =====================================================================
+       WORKING PROTOTYPE JAVASCRIPT
+       ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      // Five fictional international students sharing a rented house in Rathmines, Dublin 6
+      const HOUSEMATES = [
+        { name: 'Sam', initial: 'S', color: '#FDE68A' },
+        { name: 'Amina', initial: 'A', color: '#FBCFE8' },
+        { name: 'Diego', initial: 'D', color: '#BAE6FD' },
+        { name: 'Linh', initial: 'L', color: '#BBF7D0' },
+        { name: 'Tariq', initial: 'T', color: '#FED7AA' }
+      ];
+
+      // Pre-populated realistic Rathmines bills (invented data only)
+      function createDefaultBills() {
+        return [
+          {
+            id: 'bill-electric',
+            icon: '⚡',
+            name: 'Electric Ireland',
+            total: 145.00,
+            paidBy: 'Amina',
+            participants: ['Sam', 'Amina', 'Diego', 'Linh', 'Tariq'],
+            paidMap: {
+              Sam: false,
+              Amina: true,
+              Diego: false,
+              Linh: true,
+              Tariq: false
+            }
+          },
+          {
+            id: 'bill-broadband',
+            icon: '📶',
+            name: 'Virgin Media Broadband',
+            total: 55.00,
+            paidBy: 'Sam',
+            participants: ['Sam', 'Amina', 'Diego', 'Linh', 'Tariq'],
+            paidMap: {
+              Sam: true,
+              Amina: true,
+              Diego: false,
+              Linh: false,
+              Tariq: false
+            }
+          },
+          {
+            id: 'bill-gas',
+            icon: '🔥',
+            name: 'Bord Gáis Energy',
+            total: 90.00,
+            paidBy: 'Diego',
+            participants: ['Sam', 'Amina', 'Diego', 'Linh', 'Tariq'],
+            paidMap: {
+              Sam: false,
+              Amina: false,
+              Diego: true,
+              Linh: false,
+              Tariq: true
+            }
+          }
+        ];
+      }
+
+      let activeMember = 'Sam';
+      let bills = createDefaultBills();
+
+      // DOM elements
+      const selectorEl = document.getElementById('housemate-selector');
+      const summaryEl = document.getElementById('personal-summary');
+      const ledgerListEl = document.getElementById('bill-ledger-list');
+      const billCountPillEl = document.getElementById('bill-count-pill');
+      const payerSelectEl = document.getElementById('bill-payer');
+      const customSplitPanel = document.getElementById('custom-split-panel');
+      const customSplitList = document.getElementById('custom-split-list');
+      const newBillForm = document.getElementById('new-bill-form');
+      const billFormError = document.getElementById('bill-form-error');
+      const resetDemoBtn = document.getElementById('reset-demo-btn');
+
+      // CTA elements
+      const signupForm = document.getElementById('house-signup-form');
+      const houseNicknameInput = document.getElementById('house-nickname');
+      const studentEmailInput = document.getElementById('student-email');
+      const ctaErrorBox = document.getElementById('cta-error-box');
+      const ctaConfirmPanel = document.getElementById('cta-confirm-panel');
+      const ctaConfirmHeading = document.getElementById('cta-confirm-heading');
+      const ctaConfirmSub = document.getElementById('cta-confirm-sub');
+      const whatsappMsgBox = document.getElementById('whatsapp-msg-box');
+      const copyWaBtn = document.getElementById('copy-wa-btn');
+      const mailtoInviteLink = document.getElementById('mailto-invite-link');
+      const copyToast = document.getElementById('copy-toast');
+
+      function formatEuro(num) {
+        return '€' + Number(num).toFixed(2);
+      }
+
+      function getBillShare(bill) {
+        if (!bill.participants.length) return 0;
+        return Math.round((bill.total / bill.participants.length) * 100) / 100;
+      }
+
+      function pickBillIcon(name) {
+        const lower = name.toLowerCase();
+        if (lower.includes('electr') || lower.includes('esb')) return '⚡';
+        if (lower.includes('gas') || lower.includes('heat')) return '🔥';
+        if (lower.includes('wifi') || lower.includes('wi-fi') || lower.includes('broadband') || lower.includes('virgin')) return '📶';
+        if (lower.includes('bin') || lower.includes('waste') || lower.includes('greyhound')) return '🗑️';
+        return '🧾';
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Initialize form dropdown and custom checkboxes
+      function setupFormControls() {
+        payerSelectEl.innerHTML = HOUSEMATES.map(
+          (m) => `<option value="${m.name}">${m.name}</option>`
+        ).join('');
+
+        customSplitList.innerHTML = HOUSEMATES.map(
+          (m) => `
+            <label class="check-pill">
+              <input type="checkbox" name="splitMember" value="${m.name}" checked />
+              <span>${m.name}</span>
+            </label>
+          `
+        ).join('');
+
+        document.querySelectorAll('input[name="splitType"]').forEach((radio) => {
+          radio.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+              customSplitPanel.classList.remove('hidden');
+            } else {
+              customSplitPanel.classList.add('hidden');
+            }
+          });
+        });
+      }
+
+      // Render top housemate pill buttons
+      function renderHousemateSelector() {
+        selectorEl.innerHTML = HOUSEMATES.map((m) => {
+          const isActive = m.name === activeMember;
+          return `
+            <button
+              type="button"
+              class="mate-pill"
+              data-member="${m.name}"
+              aria-pressed="${isActive}"
+            >
+              <span class="mate-avatar" style="background:${m.color}">${m.initial}</span>
+              <span>${m.name}</span>
+            </button>
+          `;
+        }).join('');
+
+        selectorEl.querySelectorAll('.mate-pill').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            activeMember = btn.getAttribute('data-member');
+            payerSelectEl.value = activeMember;
+            renderApp();
+          });
+        });
+      }
+
+      // Render "What [Name] Owes" & "What Others Owe [Name]"
+      function renderPersonalSummary() {
+        const iOweItems = [];
+        const owedToMeItems = [];
+
+        bills.forEach((bill) => {
+          const share = getBillShare(bill);
+
+          // Bills activeMember needs to pay back
+          if (
+            bill.paidBy !== activeMember &&
+            bill.participants.includes(activeMember) &&
+            !bill.paidMap[activeMember]
+          ) {
+            iOweItems.push({
+              billId: bill.id,
+              billName: bill.name,
+              icon: bill.icon,
+              to: bill.paidBy,
+              amount: share
+            });
+          }
+
+          // Bills activeMember paid where others still owe their share
+          if (bill.paidBy === activeMember) {
+            bill.participants.forEach((person) => {
+              if (person !== activeMember && !bill.paidMap[person]) {
+                owedToMeItems.push({
+                  billId: bill.id,
+                  billName: bill.name,
+                  from: person,
+                  amount: share
+                });
+              }
+            });
+          }
+        });
+
+        const totalIOwe = iOweItems.reduce((sum, item) => sum + item.amount, 0);
+        const totalOwedToMe = owedToMeItems.reduce((sum, item) => sum + item.amount, 0);
+
+        let iOweHtml = '';
+        if (iOweItems.length === 0) {
+          iOweHtml = `
+            <div class="all-clear-box">
+              <strong>✓ ${activeMember} owes €0.00!</strong>
+              <span>All your shares for current house bills are marked paid.</span>
+            </div>
+          `;
+        } else {
+          iOweHtml = `
+            <p class="owe-total-banner">
+              Total ${activeMember} owes: <span class="owe-total-amount">${formatEuro(totalIOwe)}</span>
+            </p>
+            <div class="owe-list">
+              ${iOweItems
+                .map(
+                  (item) => `
+                  <div class="owe-item">
+                    <div>
+                      <p class="owe-item-text">
+                        You owe ${item.to} <span class="money">${formatEuro(item.amount)}</span>
+                      </p>
+                      <p class="owe-item-sub">${item.icon} ${escapeHtml(item.billName)}</p>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn btn-mint"
+                      data-settle-bill="${item.billId}"
+                      data-settle-person="${activeMember}"
+                    >
+                      ✓ Mark Paid
+                    </button>
+                  </div>
+                `
+                )
+                .join('')}
+            </div>
+          `;
+        }
+
+        let owedToMeHtml = '';
+        if (owedToMeItems.length === 0) {
+          owedToMeHtml = `<p style="margin:0; color:#C7D2FE;">Nobody owes ${activeMember} money right now.</p>`;
+        } else {
+          owedToMeHtml = `
+            <p style="margin:0 0 12px; font-weight:700; color:#E0E7FF;">
+              Housemates owe ${activeMember} <strong style="color:#6EE7B7; font-size:1.2rem;">${formatEuro(totalOwedToMe)}</strong>:
+            </p>
+            <div class="owed-to-me-grid">
+              ${owedToMeItems
+                .map(
+                  (item) => `
+                  <div class="owed-card">
+                    <div>
+                      <div><strong>${item.from}</strong> owes you <strong>${formatEuro(item.amount)}</strong></div>
+                      <div style="font-size:0.85rem; color:#D1FAE5;">${escapeHtml(item.billName)}</div>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn btn-mint"
+                      style="min-height:44px; padding:8px 14px; font-size:0.9rem;"
+                      data-settle-bill="${item.billId}"
+                      data-settle-person="${item.from}"
+                    >
+                      Mark Paid
+                    </button>
+                  </div>
+                `
+                )
+                .join('')}
+            </div>
+          `;
+        }
+
+        summaryEl.innerHTML = `
+          <div class="summary-top">
+            <div>
+              <span style="font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:#FBBF24;">
+                Viewing First Screen As
+              </span>
+              <h3 class="summary-title">What ${activeMember} Owes</h3>
+            </div>
+            <span class="house-badge">5 Housemates &bull; Dublin 6</span>
+          </div>
+
+          <div>
+            <h4 class="summary-subhead">Money To Pay</h4>
+            ${iOweHtml}
+          </div>
+
+          <div class="owed-to-me-section">
+            <h4 class="summary-subhead">What Others Owe ${activeMember}</h4>
+            ${owedToMeHtml}
+          </div>
+        `;
+
+        summaryEl.querySelectorAll('button[data-settle-bill]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const billId = btn.getAttribute('data-settle-bill');
+            const person = btn.getAttribute('data-settle-person');
+            setSharePaid(billId, person, true);
+          });
+        });
+      }
+
+      // Render Shared House Bill Ledger
+      function renderBillLedger() {
+        billCountPillEl.textContent = `${bills.length} ${bills.length === 1 ? 'bill' : 'bills'}`;
+
+        ledgerListEl.innerHTML = bills
+          .map((bill) => {
+            const share = getBillShare(bill);
+            const unpaidCount = bill.participants.filter((p) => !bill.paidMap[p]).length;
+            const isSettled = unpaidCount === 0;
+
+            return `
+              <article class="bill-card ${isSettled ? 'settled' : ''}">
+                <div class="bill-top">
+                  <div>
+                    <h4 class="bill-name">
+                      <span aria-hidden="true">${bill.icon}</span>
+                      <span>${escapeHtml(bill.name)}</span>
+                    </h4>
+                    <p class="bill-meta">
+                      Paid by <strong>${bill.paidBy}</strong> &bull; Total <strong>${formatEuro(bill.total)}</strong> &bull; Share: <strong>${formatEuro(share)}</strong> each
+                    </p>
+                  </div>
+                  <span class="status-badge ${isSettled ? 'done' : 'open'}">
+                    ${isSettled ? '✓ All Settled' : `${unpaidCount} unpaid`}
+                  </span>
+                </div>
+
+                <p class="shares-label">Tap a share to toggle Paid / Unpaid:</p>
+                <div class="shares-grid">
+                  ${bill.participants
+                    .map((person) => {
+                      if (person === bill.paidBy) {
+                        return `
+                          <div class="share-payer-box">
+                            <span class="share-person">${person}</span>
+                            <span class="share-state">Paid Bill</span>
+                          </div>
+                        `;
+                      }
+                      const paid = Boolean(bill.paidMap[person]);
+                      return `
+                        <button
+                          type="button"
+                          class="share-btn ${paid ? 'paid' : 'unpaid'}"
+                          data-toggle-bill="${bill.id}"
+                          data-toggle-person="${person}"
+                          aria-pressed="${paid}"
+                        >
+                          <span class="share-person">${person}</span>
+                          <span class="share-state">${paid ? '✓ Paid' : 'Owes ' + formatEuro(share)}</span>
+                        </button>
+                      `;
+                    })
+                    .join('')}
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+
+        ledgerListEl.querySelectorAll('button[data-toggle-bill]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const billId = btn.getAttribute('data-toggle-bill');
+            const person = btn.getAttribute('data-toggle-person');
+            setSharePaid(billId, person);
+          });
+        });
+      }
+
+      function setSharePaid(billId, person, forceValue) {
+        const target = bills.find((b) => b.id === billId);
+        if (!target || person === target.paidBy) return;
+        target.paidMap[person] = typeof forceValue === 'boolean' ? forceValue : !target.paidMap[person];
+        renderApp();
+      }
+
+      function renderApp() {
+        renderHousemateSelector();
+        renderPersonalSummary();
+        renderBillLedger();
+      }
+
+      // Handle Add & Split a New Bill Form
+      newBillForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        billFormError.classList.add('hidden');
+
+        const nameInput = document.getElementById('bill-name');
+        const amountInput = document.getElementById('bill-amount');
+        const billName = nameInput.value.trim();
+        const total = parseFloat(amountInput.value);
+        const paidBy = payerSelectEl.value;
+        const splitType = document.querySelector('input[name="splitType"]:checked').value;
+
+        if (!billName) {
+          billFormError.textContent = 'Please type a bill name (for example: Electricity or Bins).';
+          billFormError.classList.remove('hidden');
+          nameInput.focus();
+          return;
+        }
+
+        if (isNaN(total) || total <= 0) {
+          billFormError.textContent = 'Please enter a valid euro amount above €0.00.';
+          billFormError.classList.remove('hidden');
+          amountInput.focus();
+          return;
+        }
+
+        let participants = HOUSEMATES.map((m) => m.name);
+        if (splitType === 'custom') {
+          const picked = Array.from(
+            document.querySelectorAll('input[name="splitMember"]:checked')
+          ).map((cb) => cb.value);
+
+          if (picked.length === 0) {
+            billFormError.textContent = 'Please select at least one housemate to split this bill.';
+            billFormError.classList.remove('hidden');
+            return;
+          }
+          participants = picked;
+        }
+
+        const paidMap = {};
+        participants.forEach((p) => {
+          paidMap[p] = p === paidBy;
+        });
+
+        bills.unshift({
+          id: 'bill-' + Date.now(),
+          icon: pickBillIcon(billName),
+          name: billName,
+          total: Math.round(total * 100) / 100,
+          paidBy,
+          participants,
+          paidMap
+        });
+
+        nameInput.value = '';
+        amountInput.value = '';
+        renderApp();
+        summaryEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // Reset Demo Button
+      resetDemoBtn.addEventListener('click', () => {
+        bills = createDefaultBills();
+        activeMember = 'Sam';
+        payerSelectEl.value = 'Sam';
+        billFormError.classList.add('hidden');
+        renderApp();
+      });
+
+      // Handle Call to Action Form ("Start Your House Tab")
+      signupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        ctaErrorBox.classList.add('hidden');
+        copyToast.classList.add('hidden');
+
+        const nickname = houseNicknameInput.value.trim();
+        const email = studentEmailInput.value.trim();
+
+        if (!nickname) {
+          ctaErrorBox.textContent = 'Please enter a nickname for your house (for example: Rathmines Road House).';
+          ctaErrorBox.classList.remove('hidden');
+          houseNicknameInput.focus();
+          return;
+        }
+
+        if (!email || !email.includes('@')) {
+          ctaErrorBox.textContent = 'Please enter a valid email address.';
+          ctaErrorBox.classList.remove('hidden');
+          studentEmailInput.focus();
+          return;
+        }
+
+        const slug = nickname
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+        const baseUrl = window.location.href.split('#')[0].split('?')[0];
+        const houseLink = `${baseUrl}?house=${encodeURIComponent(slug || 'rathmines-d6')}`;
+
+        ctaConfirmHeading.textContent = `House Tab created for "${nickname}"!`;
+        ctaConfirmSub.textContent = `Confirmation ready for ${email}. Share this link in your house WhatsApp chat:`;
+
+        const waMessage = `Hey housemates! Here is our HouseTab D6 link for ${nickname} so we can see who owes what for electricity, gas, and Wi-Fi without chasing on WhatsApp: ${houseLink}`;
+        whatsappMsgBox.value = waMessage;
+
+        mailtoInviteLink.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(
+          'HouseTab D6 Invite: ' + nickname
+        )}&body=${encodeURIComponent(waMessage)}`;
+
+        ctaConfirmPanel.classList.remove('hidden');
+        ctaConfirmPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // Copy WhatsApp Message button (uses execCommand for iFrame compatibility)
+      copyWaBtn.addEventListener('click', () => {
+        whatsappMsgBox.select();
+        whatsappMsgBox.setSelectionRange(0, 99999);
+        try {
+          document.execCommand('copy');
+          copyToast.classList.remove('hidden');
+        } catch (err) {
+          copyToast.textContent = 'Select the box above and copy the message.';
+          copyToast.classList.remove('hidden');
+        }
+      });
+
+      // Boot app
+      setupFormControls();
+      renderApp();
+    })();
+  </script>
+</body>
+</html>
